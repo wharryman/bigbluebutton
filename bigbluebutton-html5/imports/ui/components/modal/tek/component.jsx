@@ -44,20 +44,23 @@ class TekSelect extends Component {
 
   handleSubmit(e) {
     e.preventDefault()
-    const data = this.state
-    data.meetingId = this.props.meeting;
+    const data = {}
+    data.subject = this.state.subj;
+    data.grade = this.state.gr;
+    data.lesson = this.state.lsn;
+    data.meeting = this.props.meeting;
     data.currentUser = this.props.currentUser;
     console.log('Received', data);
-    fetch('https://tutorcalculator.mindriselearningonline.com/api/lesson/', {
+    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/lesson/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
       console.log('Success:', data);
+    //TODO: add robust success/error code
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -76,7 +79,7 @@ class TekSelect extends Component {
     const grades = ['3', '4', '5', '6', '7', '8', 'HS'];
     const lessons = [];
     lessons.push('HW');
-    for (let i = 1; i <= 30; i += 1) {
+    for (let i = 1; i <= 60; i += 1) {
       lessons.push(i.toString());
     }
 
@@ -126,6 +129,7 @@ class TekSelect extends Component {
               label={intl.formatMessage(messages.submitLabel)}
               onClick={() => {
                 mountModal(null);
+		this.handleSubmit.bind(this)
               }}
             />
           </div>

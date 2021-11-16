@@ -10,7 +10,10 @@ import { UsersContext } from '/imports/ui/components/components-data/users-conte
 const TekSelectContainer = (props) => {
   const usingUsersContext = useContext(UsersContext);
   const { users } = usingUsersContext;
-  const currentUser = { userId: Auth.userID, presenter: users[Auth.meetingID][Auth.userID].presenter };
+  const currentUser = {
+	  name: Auth.fullname,
+	  userId: Auth.userID,
+	  presenter: users[Auth.meetingID][Auth.userID].presenter };
   const meeting = Meetings.findOne({ meetingId: Auth.meetingID });
 
   return <TekSelect {...props} currentUser={currentUser} meeting={meeting} />;

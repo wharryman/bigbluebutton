@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Draggable from 'react-draggable';
+import ReactDOM from 'react-dom'
+//import Draggable from 'react-draggable';
 import { defineMessages, injectIntl } from 'react-intl';
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import PropTypes from 'prop-types';
@@ -46,22 +47,25 @@ class GradingSelectModal extends Component {
         './resources/images/smiley4.png',
         './resources/images/smiley5.png',
       ],
+      gradetype: '',
+      lessonnum: '',
     };
-
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.formRef = React.createRef();
   }
 
-  // componentDidMount() {
+  handleDrops(e) {
+    this.setState({ [e.target.name]:e.target.value });
+  }
 
-  handleChange(e, userId) {
-    console.log('new value:' + e + ' ' +e.value + ' ' + userId.toString());
-    if ((userId === undefined) || (e.value === undefined)) return;
+  /*
+  handleChange(event, data, gradeitem ) {
+    console.log('new value:' + event + ' ' + data + ' ' + gradeitem);
     const newgrades = this.state.grades.map(element => {
-      if (element.userId === userId) {
+      if (element.name === gradeitem.userId) {
         return {
           ...element,
-          gradevalue: e.value,
+          gradevalue: value,
         };
       } else return element;
     });
@@ -70,13 +74,40 @@ class GradingSelectModal extends Component {
     document.querySelectorAll('.smileyspot').forEach(function(el) {
       el.style.display = 'none';
     });
-    const diff = e.value - 1;
-    const image = document.getElementById(e.target.userId + diff.toString());
+    const diff = event.value - 1;
+    const image = document.getElementById(event.target.userId + diff.toString());
     image.style.display = 'block';
   }
+  */
 
-  handleSubmit(event) {
-    event.preventDefault();
+  
+  handleSubmit(e) {
+    e.preventDefault()
+    const data = {}
+    console.log("HERE");
+    data.grades= this.state.grades;
+    data.gradetype = this.state.gradetype;
+    data.lessonnum = this.state.lessonnum;
+    data.currentUser = Auth.fullInfo;
+    console.log('Received', data.grades);
+    data.grades.map((e) => {
+      console.log('finding ' + e.name);
+      e.gradevalue = document.getElementById(e.userId).value
+    });
+    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/grade/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      console.log('Success:', data);
+    //TODO: add robust success/error code
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   }
 
   render() {
@@ -100,7 +131,6 @@ class GradingSelectModal extends Component {
     // const lessons = [...Array(100).keys()];
 
     return (
-      <Draggable>
         <Modal
           overlayClassName={styles.overlay}
           className={styles.modal}
@@ -108,6 +138,7 @@ class GradingSelectModal extends Component {
           hideBorder
           contentLabel={title}
         >
+	<form id="myform" onSubmit={this.handleSubmit.bind(this)} ref={this.formRef}>
           <div className={styles.container}>
             <div className={styles.header}>
               <div className={styles.title}>
@@ -116,11 +147,11 @@ class GradingSelectModal extends Component {
             </div>
             <div className={styles.columns}>
               <div>
-                <select name="gradetype">
+                <select name="gradetype" onChange={this.handleDrops.bind(this)}>
                   <option value="" selected disabled hidden>Select Grade Type</option>
                   {gradetype.map((gt) => <option value={gt}>{gt}</option>)}
                 </select>
-                <select name="lessonnum">
+                <select name="lessonnum" onChange={this.handleDrops.bind(this)}>
                   <option value="" selected disabled hidden>Choose Problem</option>
                   {lessons.map((lesson) => <option value={lesson}>{lesson}</option>)}
                 </select>
@@ -135,7 +166,6 @@ class GradingSelectModal extends Component {
               </div>
             </div>
             <div>
-              <form onSubmit={this.handleSubmit}>
                 <table className={styles.studentlist}>
                   <colgroup>
                     <col className={styles.cw50} />
@@ -157,18 +187,16 @@ class GradingSelectModal extends Component {
                             defaultValue="0"
                             className={styles.slider}
                             name={gradeitem.userId}
-                            onChange={this.handleChange.bind(this, gradeitem.userId)}
-                            key={gradeitem.userId}
+			    id={gradeitem.userId}
                           />
                         </td>
-                        <td id={gradeitem.userId}>
+                        <td>
                           {this.state.smileys.map((sm, i) => <img src={sm} id={"img" + i} className={styles.smileyspot} alt="logo" /> )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </form>
             </div>
             <div className={styles.footer}>
               <Button
@@ -176,13 +204,14 @@ class GradingSelectModal extends Component {
                 className={styles.confirmBtn}
                 label={intl.formatMessage(messages.submitLabel)}
                 onClick={() => {
-                  mountModal(null);
+		  this.handleSubmit.bind(this);
+		  mountModal(null);
                 }}
               />
             </div>
           </div>
+          </form>
         </Modal>
-      </Draggable>
     );
   }
 }

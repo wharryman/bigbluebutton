@@ -49,16 +49,35 @@ class EffortSelectModal extends Component {
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
+  handleSubmit(e) {
+    e.preventDefault()
+    const data = {}
+    console.log("HERE");
+    data.grades= this.state.grades;
+    data.currentUser = Auth.fullInfo;
+    console.log('Received', data.grades);
+    data.grades.map((e) => {
+      console.log('finding ' + e.name);
+      e.gradevalue = document.getElementById(e.userId).value
+    });
+    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/grade/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      console.log('Success:', data);
+    //TODO: add robust success/error code
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   }
-
-  handleChange(e, userId) {
-    console.log('new value:' + e + ' ' +e.value + ' ' + userId.toString());
-  }
+  
 
   render() {
     const {
@@ -68,9 +87,10 @@ class EffortSelectModal extends Component {
     const {
       smileys,
     } = this.state;
-
+    
+    const grades = this.props.grade ? [this.props.grade] : this.state.grades;
+    
     return (
-      <Draggable>
         <Modal
           overlayClassName={styles.overlay}
           className={styles.modal}
@@ -78,6 +98,7 @@ class EffortSelectModal extends Component {
           hideBorder
           contentLabel={title}
         >
+	<form id="myform" onSubmit={this.handleSubmit.bind(this)} ref={this.formRef}>
           <div className={styles.container}>
             <div className={styles.header}>
               <div className={styles.title}>
@@ -85,9 +106,8 @@ class EffortSelectModal extends Component {
               </div>
             </div>
             <div className={styles.columns}>
-              <div>
-                &nbsp;
-              </div>
+	    <div>&nbsp;
+	    </div>
               <div>
                 <span className={styles.smileysbar}>N/A</span>
                 <img src="./resources/images/smiley1.png" alt="logo" className={styles.smileysbar} />
@@ -98,7 +118,6 @@ class EffortSelectModal extends Component {
               </div>
             </div>
             <div>
-              <form onSubmit={this.handleSubmit}>
                 <table className={styles.studentlist}>
                   <colgroup>
                     <col className={styles.cw50} />
@@ -106,7 +125,7 @@ class EffortSelectModal extends Component {
                     <col className={styles.cw10} />
                   </colgroup>
                   <tbody>
-                    {this.state.grades.map((gradeitem, index) => (
+                    {grades.map((gradeitem, index) => (
                       <tr>
                         <td className={styles.studentname}>
                           {gradeitem.name}
@@ -120,18 +139,16 @@ class EffortSelectModal extends Component {
                             defaultValue="0"
                             className={styles.slider}
                             name={gradeitem.userId}
-                            onChange={this.handleChange.bind(this, gradeitem.userId)}
-                            key={gradeitem.userId}
+			    id={gradeitem.userId}
                           />
                         </td>
-                        <td id={gradeitem.userId}>
-                          {this.state.smileys.map((sm, i) => <img src={sm} id={"img" + i} className={styles.smileyspot} alt="logo" />)}
+                        <td>
+                          {this.state.smileys.map((sm, i) => <img src={sm} id={"img" + i} className={styles.smileyspot} alt="logo" /> )}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </form>
             </div>
             <div className={styles.footer}>
               <Button
@@ -139,13 +156,15 @@ class EffortSelectModal extends Component {
                 className={styles.confirmBtn}
                 label={intl.formatMessage(messages.submitLabel)}
                 onClick={() => {
-                  mountModal(null);
+		  this.handleSubmit.bind(this);
+		  mountModal(null);
                 }}
               />
             </div>
           </div>
+          </form>
         </Modal>
-      </Draggable>
+
     );
   }
 }
