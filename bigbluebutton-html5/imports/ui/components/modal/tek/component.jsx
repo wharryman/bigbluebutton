@@ -44,20 +44,23 @@ class TekSelect extends Component {
 
   handleSubmit(e) {
     e.preventDefault()
-    const data = this.state
-    data.meetingId = this.props.meeting;
+    const data = {}
+    data.subject = this.state.subj;
+    data.grade = this.state.gr;
+    data.lesson = this.state.lsn;
+    data.meeting = this.props.meeting;
     data.currentUser = this.props.currentUser;
     console.log('Received', data);
-    fetch('https://tutorcalculator.mindriselearningonline.com/api/lesson/', {
+    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/lesson/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
       console.log('Success:', data);
+    //TODO: add robust success/error code
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -72,8 +75,13 @@ class TekSelect extends Component {
       currentUser,
       meeting,
     } = this.props;
-    const subjects = ['Math', 'Reading', 'Science', 'Social Studies', 'Algebra', 'Biology', 'History', 'ELA 1', 'ELA 2'];
+    const subjects = ['Math', 'Reading', 'Science', 'Social Studies', 'Algebra', 'Biology', 'History', 'ELA 1', 'ELA 2', 'EnglishLanguageArts'];
     const grades = ['3', '4', '5', '6', '7', '8', 'HS'];
+    const lessons = [];
+    lessons.push('HW');
+    for (let i = 1; i <= 60; i += 1) {
+      lessons.push(i.toString());
+    }
 
     return (
       <Modal
@@ -86,35 +94,46 @@ class TekSelect extends Component {
         <div className={styles.container}>
           <div className={styles.header}>
             <div className={styles.title}>
-              Input Current Subject/Grade/Lesson:
+              Input the Subject     /     Grade     /     Lesson:
             </div>
           </div>
         </div>
-        <div className={styles.description}>
-          <form id="myform" onSubmit={this.handleSubmit.bind(this)}>
-            <span>
+        <form id="myform" onSubmit={this.handleSubmit.bind(this)}>
+          <div className={styles.columns}>
+            <div>
+              <span className={styles.columnheader}>Subject: </span>
               <select name="subj" onChange={this.handleChange.bind(this)}>
                 <option value="" selected disabled hidden>Select Subject</option>
                 {subjects.map((subject) => <option value={subject}>{subject}</option>)}
               </select>
+            </div>
+            <div>
+              <span className={styles.columnheader}>Grade: </span>
               <select name="gr" onChange={this.handleChange.bind(this)}>
                 <option value="" selected disabled hidden>Select Grade</option>
                 {grades.map((grade) => <option value={grade}>{grade}</option>)}
               </select>
-              <input type="number" name="lsn" required="required" min="1" max="99" onChange={this.handleChange.bind(this)} />
-            </span>
-            <div className={styles.footer}>
-              <Button
-                color="primary"
-                className={styles.confirmBtn}
-                label={intl.formatMessage(messages.submitLabel)}
-                onClick={() => {
-                  mountModal(null);
-                }}
-              />
             </div>
-          </form>
-        </div>
+            <div>
+              <span className={styles.columnheader}>Lesson: </span>
+              <select name="lsn" onChange={this.handleChange.bind(this)}>
+                <option value="" selected disabled hidden>Select Lesson</option>
+                {lessons.map((lsn) => <option value={lsn}>{lsn}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className={styles.footer}>
+            <Button
+              color="primary"
+              className={styles.confirmBtn}
+              label={intl.formatMessage(messages.submitLabel)}
+              onClick={() => {
+                mountModal(null);
+		this.handleSubmit.bind(this)
+              }}
+            />
+          </div>
+        </form>
       </Modal>
     );
   }

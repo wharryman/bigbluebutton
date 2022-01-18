@@ -444,6 +444,7 @@ const clearAllEmojiStatus = (users) => {
 };
 
 const assignPresenter = (userId) => { makeCall('assignPresenter', userId); };
+const assignGrade = (userId) => { makeCall('assignGrade', userId); };
 
 const removeUser = (userId, banUser) => {
   if (isVoiceOnlyUser(userId)) {
@@ -655,6 +656,7 @@ export default {
   setEmojiStatus,
   clearAllEmojiStatus,
   assignPresenter,
+  assignGrade,
   removeUser,
   toggleVoice,
   muteAllUsers,

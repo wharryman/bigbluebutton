@@ -1,7 +1,5 @@
 import _ from 'lodash';
 import React, { PureComponent } from 'react';
-import * as Sentry from '@sentry/react';
-import { Integrations } from '@sentry/tracing';
 import PropTypes from 'prop-types';
 import { defineMessages } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
@@ -16,16 +14,6 @@ import BBBMenu from '/imports/ui/components/menu/component';
 import cx from 'classnames';
 import { styles } from '../styles';
 import { PANELS, ACTIONS } from '../../layout/enums';
-
-Sentry.init({
-  dsn: 'https://2b68e950743448308dfe49f2c0b88d94@o1003357.ingest.sentry.io/5972780',
-  integrations: [new Integrations.BrowserTracing()],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
 
 const propTypes = {
   amIPresenter: PropTypes.bool.isRequired,

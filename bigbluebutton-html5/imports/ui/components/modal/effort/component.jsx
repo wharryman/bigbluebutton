@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Draggable from 'react-draggable';
 import { defineMessages, injectIntl } from 'react-intl';
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import PropTypes from 'prop-types';
@@ -27,7 +28,6 @@ class EffortSelectModal extends Component {
     super(props);
 
     this.state = {
-      checked: false,
       grades: Users.find({
         meetingId: Auth.meetingID,
         presenter: { $ne: true },
@@ -48,36 +48,36 @@ class EffortSelectModal extends Component {
       ],
     };
 
-
-
-    this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(e, userId) {
-    console.log('new value:' + e + ' ' +e.value + ' ' + userId);
-    if (userId === undefined) return;
-    const newgrades = this.state.grades.map(element => {
-      if (element.userId === userId) {
-        return {
-          ...element,
-          gradevalue: e.value,
-        };
-      } else return element;
+  handleSubmit(e) {
+    e.preventDefault()
+    const data = {}
+    console.log("HERE");
+    data.grades= this.state.grades;
+    data.currentUser = Auth.fullInfo;
+    console.log('Received', data.grades);
+    data.grades.map((e) => {
+      console.log('finding ' + e.name);
+      e.gradevalue = document.getElementById(e.userId).value
     });
-    this.setState({ grades: newgrades });
-
-    document.querySelectorAll('.smileyspot').forEach(function(el) {
-      el.style.display = 'none';
+    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/grade/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      console.log('Success:', data);
+    //TODO: add robust success/error code
+    })
+    .catch((error) => {
+      console.error('Error:', error);
     });
-    const diff = e.target.value - 1;
-    const image = document.getElementById(e.target.userId + diff.toString());
-    image.style.display = 'block';
   }
-
-  handleSubmit(event) {
-    event.preventDefault();
-  }
+  
 
   render() {
     const {
@@ -85,83 +85,86 @@ class EffortSelectModal extends Component {
     } = this.props;
 
     const {
-      checked,
       smileys,
     } = this.state;
-
-    const gradetype = ['Lesson', 'IP'];
-    const lessons = [...Array(100).keys()];
-
+    
+    const grades = this.props.grade ? [this.props.grade] : this.state.grades;
+    
     return (
-      <Modal
-        overlayClassName={styles.overlay}
-        className={styles.modal}
-        onRequestClose={() => mountModal(null)}
-        hideBorder
-        contentLabel={title}
-      >
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <div className={styles.title}>
-              Assign Grades for your Students:
+        <Modal
+          overlayClassName={styles.overlay}
+          className={styles.modal}
+          onRequestClose={() => mountModal(null)}
+          hideBorder
+          contentLabel={title}
+        >
+	<form id="myform" onSubmit={this.handleSubmit.bind(this)} ref={this.formRef}>
+          <div className={styles.container}>
+            <div className={styles.header}>
+              <div className={styles.title}>
+                Assign Grades for your Students:
+              </div>
+            </div>
+            <div className={styles.columns}>
+	    <div>&nbsp;
+	    </div>
+              <div>
+                <span className={styles.smileysbar}>N/A</span>
+                <img src="./resources/images/smiley1.png" alt="logo" className={styles.smileysbar} />
+                <img src="./resources/images/smiley2.png" alt="logo" className={styles.smileysbar} />
+                <img src="./resources/images/smiley3.png" alt="logo" className={styles.smileysbar} />
+                <img src="./resources/images/smiley4.png" alt="logo" className={styles.smileysbar} />
+                <img src="./resources/images/smiley5.png" alt="logo" className={styles.smileysbar} />
+              </div>
+            </div>
+            <div>
+                <table className={styles.studentlist}>
+                  <colgroup>
+                    <col className={styles.cw50} />
+                    <col className={styles.cw40} />
+                    <col className={styles.cw10} />
+                  </colgroup>
+                  <tbody>
+                    {grades.map((gradeitem, index) => (
+                      <tr>
+                        <td className={styles.studentname}>
+                          {gradeitem.name}
+                        </td>
+                        <td>
+                          <input
+                            type="range"
+                            min="0"
+                            max="5"
+                            step="1"
+                            defaultValue="0"
+                            className={styles.slider}
+                            name={gradeitem.userId}
+			    id={gradeitem.userId}
+                          />
+                        </td>
+                        <td>
+                          {this.state.smileys.map((sm, i) => <img src={sm} id={"img" + i} className={styles.smileyspot} alt="logo" /> )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+            </div>
+            <div className={styles.footer}>
+              <Button
+                color="primary"
+                className={styles.confirmBtn}
+                label={intl.formatMessage(messages.submitLabel)}
+                onClick={() => {
+		  this.handleSubmit.bind(this);
+		  mountModal(null);
+                }}
+              />
             </div>
           </div>
-          <div className={styles.columns}>
-            <div className={styles.column}>
-              &nbsp;
-            </div>
-            <div className={styles.column}>
-              <img src="./resources/images/smilelist.png" alt="logo" className={styles.smileysbar} />
-            </div>
-          </div>
-          <div>
-            <form onSubmit={this.handleSubmit}>
-              <table className={styles.studentlist}>
-                <colgroup>
-                  <col className={styles.cw40} />
-                  <col className={styles.cw50} />
-                  <col className={styles.cw10} />
-                </colgroup>
-                <tbody>
-                  {this.state.grades.map((gradeitem, index) => (
-                    <tr>
-                      <td>
-                        {gradeitem.name}
-                      </td>
-                      <td>
-                        <input
-                          type="range"
-                          min="1"
-                          max="5"
-                          step="1"
-                          value={gradeitem.value}
-                          className={styles.slider}
-                          name={gradeitem.userId}
-                          onChange={this.handleChange(gradeitem.userId)}
-                          key={gradeitem.userId}
-                        />
-                      </td>
-                      <td id={gradeitem.userId}>
-                        {this.state.smileys.map((sm, i) => <img src={sm} id={"img" + i} className={styles.smileyspot} alt="logo" /> )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </form>
-          </div>
-          <div className={styles.footer}>
-            <Button
-              color="primary"
-              className={styles.confirmBtn}
-              label={intl.formatMessage(messages.submitLabel)}
-              onClick={() => {
-                mountModal(null);
-              }}
-            />
-          </div>
-        </div>
-      </Modal>
+          </form>
+        </Modal>
+
     );
   }
 }
