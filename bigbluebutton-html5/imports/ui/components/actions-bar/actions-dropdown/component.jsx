@@ -225,7 +225,6 @@ class ActionsDropdown extends PureComponent {
           : intl.formatMessage(intlMessages.stopExternalVideoLabel),
         key: "external-video",
         onClick: isSharingVideo ? stopExternalVideoShare : this.handleExternalVideoClick,
-<<<<<<< HEAD
         dataTest: "shareExternalVideo",
       });
     }
