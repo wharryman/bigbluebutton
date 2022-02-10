@@ -21,6 +21,7 @@ class UserListItem extends PureComponent {
     const {
       user,
       assignPresenter,
+      assignGrade,
       compact,
       currentUser,
       changeRole,
@@ -59,6 +60,7 @@ class UserListItem extends PureComponent {
       <UserDropdown
         {...{
           assignPresenter,
+          assignGrade,
           compact,
           changeRole,
           currentUser,

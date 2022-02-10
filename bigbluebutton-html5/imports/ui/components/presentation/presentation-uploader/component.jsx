@@ -95,6 +95,14 @@ const intlMessages = defineMessages({
     id: 'app.presentationUploder.extraHint',
     description: 'message used to indicate upload file max sizes',
   },
+  URLzone: {
+    id: 'app.presentationUploder.URLzone',
+    description: 'message used in the url input for upload',
+  },
+  URLbutton: {
+    id: 'app.presentationUploder.URLbutton',
+    description: 'button label for url input for uploading slides',
+  },
   rejectedError: {
     id: 'app.presentationUploder.rejectedError',
     description: 'some files rejected, please check the file mime types',
@@ -225,7 +233,7 @@ const intlMessages = defineMessages({
   uploadViewTitle: {
     id: 'app.presentationUploder.uploadViewTitle',
     description: 'view name apended to document title',
-  }
+  },
 });
 
 class PresentationUploader extends Component {
@@ -236,6 +244,7 @@ class PresentationUploader extends Component {
       presentations: [],
       disableActions: false,
       toUploadCount: 0,
+      file: [],
     };
 
     this.toastId = null;
@@ -249,8 +258,10 @@ class PresentationUploader extends Component {
     this.handleCurrentChange = this.handleCurrentChange.bind(this);
     this.handleDismissToast = this.handleDismissToast.bind(this);
     this.handleToggleDownloadable = this.handleToggleDownloadable.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     // renders
     this.renderDropzone = this.renderDropzone.bind(this);
+    // this.renderURLzone = this.renderURLzone.bind(this);
     this.renderPicDropzone = this.renderPicDropzone.bind(this);
     this.renderPresentationList = this.renderPresentationList.bind(this);
     this.renderPresentationItem = this.renderPresentationItem.bind(this);
@@ -273,15 +284,15 @@ class PresentationUploader extends Component {
     // Updates presentation list when chat modal opens to avoid missing presentations
     if (isOpen && !prevProps.isOpen) {
       registerTitleView(intl.formatMessage(intlMessages.uploadViewTitle));
-      const  focusableElements =
+      const focusableElements =
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
       const modal = document.getElementById('upload-modal');
       const firstFocusableElement = modal?.querySelectorAll(focusableElements)[0];
       const focusableContent = modal?.querySelectorAll(focusableElements);
       const lastFocusableElement = focusableContent[focusableContent.length - 1];
-      
+
       firstFocusableElement.focus();
-  
+
       modal.addEventListener('keydown', function(e) {
         let tab = e.key === 'Tab' || e.keyCode === TAB;
         if (!tab) return;
@@ -324,6 +335,32 @@ class PresentationUploader extends Component {
 
   componentWillUnmount() {
     Session.set('showUploadPresentationView', false);
+  }
+
+  async handleSubmit(event) {
+    let file = [];
+    const data = new FormData(event.target);
+    const loc = data.get('urlzone');
+    const fileName = loc
+      .split('/')
+      .pop()
+      .replaceAll('%20', '-')
+      .replace('%28', '-')
+      .replace('%29', '-');
+    async function handleURLzone(url) {
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Http error! status {response.status}');
+      }
+      const blob = await response.blob();
+      return file.push(new File([blob], fileName, { type: 'application/pdf' }));
+    }
+    event.preventDefault();
+    await handleURLzone(loc);
+    await this.handleFiledrop(file, []);
   }
 
   handleDismissToast() {
@@ -875,6 +912,35 @@ class PresentationUploader extends Component {
     );
   }
 
+  renderURLzone() {
+    const {
+      intl,
+    } = this.props;
+    return (
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <label htmlFor="urlinput">
+            {intl.formatMessage(intlMessages.URLzone)}
+          </label>
+          <input
+            id="urlinput"
+            className={styles.urlinput}
+            type="url"
+            name="urlzone"
+            placeholder="Copy/Paste the link to the lesson slides here"
+          />
+          <Button
+            type="submit"
+            className={styles.confirm}
+            data-test="presentation-url"
+            color="primary"
+            label={intl.formatMessage(intlMessages.URLbutton)}
+          />
+        </form>
+      </div>
+    );
+  }
+
   renderDropzone() {
     const {
       intl,
@@ -1070,6 +1136,7 @@ class PresentationUploader extends Component {
             {fileUploadConstraintsHint ? this.renderExtraHint() : null}
           </div>
           {this.renderPresentationList()}
+          {this.renderURLzone()}
           {isMobile ? this.renderPicDropzone() : null}
           {this.renderDropzone()}
         </div>

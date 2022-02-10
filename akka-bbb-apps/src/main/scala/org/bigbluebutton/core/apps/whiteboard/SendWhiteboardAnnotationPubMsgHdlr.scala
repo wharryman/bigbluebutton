@@ -66,8 +66,10 @@ trait SendWhiteboardAnnotationPubMsgHdlr extends RightsManagementTrait {
     }
 
     def excludedWbMsg(annotation: AnnotationVO): Boolean = {
-      WhiteboardKeyUtil.DRAW_END_STATUS == annotation.status ||
-        WhiteboardKeyUtil.DRAW_UPDATE_STATUS == annotation.status
+      (WhiteboardKeyUtil.PENCIL_TYPE == annotation.annotationType ||
+        WhiteboardKeyUtil.HIGHLIGHTER_TYPE == annotation.annotationType) &&  
+        (WhiteboardKeyUtil.DRAW_END_STATUS == annotation.status ||
+          WhiteboardKeyUtil.DRAW_UPDATE_STATUS == annotation.status)
     }
 
     val isMessageOfAllowedType = excludedWbMsg(msg.body.annotation)
