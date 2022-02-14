@@ -12,6 +12,7 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import RemoveUserModal from '/imports/ui/components/modal/remove-user/component';
 import VideoService from '/imports/ui/components/video-provider/service';
 import BBBMenu from '/imports/ui/components/menu/component';
+import GradingSelect from '/imports/ui/components/modal/grading/component';
 import { styles } from './styles';
 import UserName from '../user-name/component';
 import { PANELS, ACTIONS } from '../../../../../layout/enums';
@@ -130,6 +131,10 @@ const messages = defineMessages({
     id: 'app.userlist.menu.removeConfirmation.desc',
     description: 'description for remove user confirmation',
   },
+  gradeSingleUser: {
+    id: 'app.userlist.menu.singleGrade.label',
+    description: 'description for giving a grade to a single user',
+  },
 });
 
 const propTypes = {
@@ -243,6 +248,7 @@ class UserDropdown extends PureComponent {
       getEmojiList,
       setEmojiStatus,
       assignPresenter,
+      assignGrade,
       removeUser,
       toggleVoice,
       changeRole,
@@ -430,6 +436,24 @@ class UserDropdown extends PureComponent {
         },
         icon: 'pen_tool',
         dataTest: 'changeWhiteboardAccess',
+      });
+    }
+
+    if ((user !== currentUser) && amIModerator && meetingIsBreakout) {
+      actions.push({
+        key: 'grade',
+        label: intl.formatMessage(messages.gradeSingleUser),
+        icon: 'promote',
+        onClick: () => {
+          this.onActionsHide(mountModal(
+            <GradingSelect
+              intl={intl}
+              grade={user}
+            />,
+          ));
+          this.onActionsHide(assignGrade(user.userId));
+          this.handleClose();
+        },
       });
     }
 
