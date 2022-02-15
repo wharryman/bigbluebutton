@@ -57,6 +57,7 @@ class EffortSelectModal extends Component {
     console.log("HERE");
     data.grades= this.state.grades;
     data.currentUser = Auth.fullInfo;
+    data.effort = true;
     console.log('Received', data.grades);
     data.grades.map((e) => {
       console.log('finding ' + e.name);

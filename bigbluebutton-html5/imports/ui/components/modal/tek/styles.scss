@@ -2,6 +2,9 @@
 @import "/imports/ui/stylesheets/variables/placeholders";
 @import "../base/styles";
 
+.hidden {
+    display:none !important
+}
 
 .modalViewContainer {
     display: flex;

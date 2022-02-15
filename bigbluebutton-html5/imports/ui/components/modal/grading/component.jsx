@@ -89,6 +89,7 @@ class GradingSelectModal extends Component {
     data.gradetype = this.state.gradetype;
     data.lessonnum = this.state.lessonnum;
     data.currentUser = Auth.fullInfo;
+    data.effort = false;
     console.log('Received', data.grades);
     data.grades.map((e) => {
       console.log('finding ' + e.name);

@@ -16,6 +16,10 @@ const messages = defineMessages({
     id: 'app.polling.submitLabel',
     description: 'confirm button label',
   },
+  closeLabel: {
+    id: 'app.poll.closeLabel',
+    description: 'confirm button label',
+  },
 });
 
 const propTypes = {
@@ -33,9 +37,13 @@ class TekSelect extends Component {
       subj: '',
       gr: '',
       lsn: '1',
+      hideForm: false,
+      hideClose: true,
+      hideError: true,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClose = this.handleSubmit.bind(this);
   }
 
   handleChange(e) {
@@ -60,9 +68,14 @@ class TekSelect extends Component {
     })
     .then(response => {
       console.log('Success:', data);
+      this.setState({ hideForm: true });
+      this.setState({ hideClose: false });
     //TODO: add robust success/error code
     })
     .catch((error) => {
+      this.setState({ hideForm: true });
+      this.setState({ hideClose: true });
+      this.setState({ hideError: false });
       console.error('Error:', error);
     });
   }
@@ -98,43 +111,84 @@ class TekSelect extends Component {
             </div>
           </div>
         </div>
-        <form id="myform" onSubmit={this.handleSubmit.bind(this)}>
-          <div className={styles.columns}>
-            <div>
-              <span className={styles.columnheader}>Subject: </span>
-              <select name="subj" onChange={this.handleChange.bind(this)}>
-                <option value="" selected disabled hidden>Select Subject</option>
-                {subjects.map((subject) => <option value={subject}>{subject}</option>)}
-              </select>
-            </div>
-            <div>
-              <span className={styles.columnheader}>Grade: </span>
-              <select name="gr" onChange={this.handleChange.bind(this)}>
-                <option value="" selected disabled hidden>Select Grade</option>
-                {grades.map((grade) => <option value={grade}>{grade}</option>)}
-              </select>
-            </div>
-            <div>
-              <span className={styles.columnheader}>Lesson: </span>
-              <select name="lsn" onChange={this.handleChange.bind(this)}>
-                <option value="" selected disabled hidden>Select Lesson</option>
-                {lessons.map((lsn) => <option value={lsn}>{lsn}</option>)}
-              </select>
-            </div>
-          </div>
-          <div className={styles.footer}>
+	<div id="myform" className={this.state.hideForm ? styles.hidden : undefined}>
+	    <form id="myform" onSubmit={this.handleSubmit.bind(this)}>
+	      <div className={styles.columns}>
+		<div>
+		  <span className={styles.columnheader}>Subject: </span>
+		  <select name="subj" onChange={this.handleChange.bind(this)}>
+		    <option value="" selected disabled hidden>Select Subject</option>
+		    {subjects.map((subject) => <option value={subject}>{subject}</option>)}
+		  </select>
+		</div>
+		<div>
+		  <span className={styles.columnheader}>Grade: </span>
+		  <select name="gr" onChange={this.handleChange.bind(this)}>
+		    <option value="" selected disabled hidden>Select Grade</option>
+		    {grades.map((grade) => <option value={grade}>{grade}</option>)}
+		  </select>
+		</div>
+		<div>
+		  <span className={styles.columnheader}>Lesson: </span>
+		  <select name="lsn" onChange={this.handleChange.bind(this)}>
+		    <option value="" selected disabled hidden>Select Lesson</option>
+		    {lessons.map((lsn) => <option value={lsn}>{lsn}</option>)}
+		  </select>
+		</div>
+	      </div>
+        <div className={styles.footer}>
             <Button
+              id="submitBtn"
               color="primary"
               className={styles.confirmBtn}
               label={intl.formatMessage(messages.submitLabel)}
               onClick={() => {
-                mountModal(null);
-		this.handleSubmit.bind(this)
+                this.handleSubmit.bind(this)
               }}
             />
-          </div>
-        </form>
-      </Modal>
+	      </div>
+	    </form>
+    </div>
+    <div id="modal2" className={this.state.hideClose? styles.hidden : undefined}>
+        <div>
+            <span className={styles.columnheader}>
+                You submitted the following Lesson information:
+                <ul>
+                    <li>Subject: {this.state.subj}</li>
+                    <li>Grade Level: {this.state.gr}</li>
+                    <li>Lesson: {this.state.lsn}</li>
+                </ul>
+            </span>
+        </div>
+        
+        <Button 
+          id="closeBtn"
+              color="primary"
+              className={styles.confirmBtn}
+              label={intl.formatMessage(messages.closeLabel)}
+              onClick={() => {
+                mountModal(null);
+              }}
+            />
+    </div>
+    <div id="modalError" className={this.state.hideError? styles.hidden : undefined}>
+        <div>
+            <span className={styles.columnheader}>
+                WARNING: You attempted to submit a Lesson, but an error occurred. Please try again, and if this reoccurrs contact your manager/site admin.
+            </span>
+        </div>
+        
+        <Button 
+          id="closeBtn"
+              color="primary"
+              className={styles.confirmBtn}
+              label={intl.formatMessage(messages.closeLabel)}
+              onClick={() => {
+                mountModal(null);
+              }}
+            />
+    </div>
+  </Modal>
     );
   }
 }
