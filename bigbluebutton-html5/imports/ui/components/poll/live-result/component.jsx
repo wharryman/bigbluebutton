@@ -25,6 +25,10 @@ const intlMessages = defineMessages({
     id: 'app.poll.cancelPollLabel',
     description: 'label for cancel poll button',
   },
+  closePollLabel: {
+    id: 'app.poll.closePollLabel',
+    description: 'label for the close poll button',
+  },
   backLabel: {
     id: 'app.poll.backLabel',
     description: 'label for the return to poll options button',
@@ -61,7 +65,7 @@ class LiveResult extends PureComponent {
     if (!currentPoll) return null;
 
     const {
-      answers, responses, users, numResponders, pollType
+      answers, responses, users, numRespondents, pollType,
     } = currentPoll;
 
     const defaultPoll = isDefaultPoll(pollType);
@@ -110,8 +114,9 @@ class LiveResult extends PureComponent {
 
     answers.reduce(caseInsensitiveReducer, []).map((obj) => {
       const formattedMessageIndex = obj.key.toLowerCase();
-      const pct = Math.round(obj.numVotes / numResponders * 100);
-      const pctFotmatted = `${Number.isNaN(pct) ? 0 : pct}%`;
+      const pct = Math.round(obj.numVotes / numRespondents * 100);
+      // const pctFotmatted = `${Number.isNaN(pct) ? 0 : pct}%`;
+      const pctFotmatted = '';
 
       const calculatedWidth = {
         width: pctFotmatted,
@@ -129,9 +134,6 @@ class LiveResult extends PureComponent {
           <div className={styles.center}>
             <div className={styles.barShade} style={calculatedWidth} />
             <div className={styles.barVal}>{obj.numVotes || 0}</div>
-          </div>
-          <div className={styles.right}>
-            {pctFotmatted}
           </div>
         </div>,
       );
@@ -244,18 +246,19 @@ class LiveResult extends PureComponent {
         <div className={styles.separator} />
         { currentPoll && !currentPoll.secretPoll
           ? (
-            <table>
-              <tbody>
-                <tr>
-                  <th className={styles.theading}>{intl.formatMessage(intlMessages.usersTitle)}</th>
-                  <th className={styles.theading}>{intl.formatMessage(intlMessages.responsesTitle)}</th>
-                </tr>
-                {userAnswers}
-              </tbody>
-            </table>
-          ) : (
+              <table>
+                <tbody>
+                  <tr>
+                    <th className={styles.theading}>{intl.formatMessage(intlMessages.usersTitle)}</th>
+                    <th className={styles.theading}>{intl.formatMessage(intlMessages.responsesTitle)}</th>
+                  </tr>
+                  {userAnswers}
+                </tbody>
+              </table>
+          )
+          : (
             currentPoll ? (<div>{intl.formatMessage(intlMessages.secretPollLabel)}</div>) : null
-        )}
+          )}
       </div>
     );
   }
