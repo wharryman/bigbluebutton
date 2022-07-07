@@ -83,6 +83,7 @@ class PresentationToolbar extends PureComponent {
     this.nextSlideHandler = this.nextSlideHandler.bind(this);
     this.previousSlideHandler = this.previousSlideHandler.bind(this);
     this.fullscreenToggleHandler = this.fullscreenToggleHandler.bind(this);
+    this.renderGradingModal = this.renderGradingModal.bind(this);
   }
 
   componentDidMount() {
@@ -132,10 +133,13 @@ class PresentationToolbar extends PureComponent {
       currentSlideNum,
       numberOfSlides,
       podId,
+      mountGrading,
     } = this.props;
 
     if (event) event.currentTarget.blur();
+    console.log("nextSlideHandler");
     nextSlide(currentSlideNum, numberOfSlides, podId);
+    mountGrading();
   }
 
   previousSlideHandler(event) {
@@ -205,6 +209,13 @@ class PresentationToolbar extends PureComponent {
       </div>
     );
   }
+  renderGradingModal() {
+    const { intl } = this.props;
+    return (
+      <GradingContainer 
+      />
+    );
+  }
 
   renderSkipSlideOpts(numberOfSlides) {
     // Fill drop down menu with all the slides in presentation
@@ -265,6 +276,13 @@ class PresentationToolbar extends PureComponent {
           }
         }>
         {this.renderAriaDescs()}
+        {/*<Styled.GradingModal
+        onRequestClose={closeModal}
+        hideBorder
+        shouldShowCloseButton={false}
+        contentLabel={intl.formatMessage(intlMessages.ariaModalTitle)}
+      >
+      */}
         {
           <div>
             {isPollingEnabled
@@ -382,6 +400,7 @@ PresentationToolbar.propTypes = {
   numberOfSlides: PropTypes.number.isRequired,
   // Actions required for the presenter toolbar
   nextSlide: PropTypes.func.isRequired,
+  mountGrading: PropTypes.func.isRequired,
   previousSlide: PropTypes.func.isRequired,
   skipToSlide: PropTypes.func.isRequired,
   intl: PropTypes.shape({
