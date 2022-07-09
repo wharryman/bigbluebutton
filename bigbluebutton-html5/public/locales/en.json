@@ -744,6 +744,8 @@
     "app.recording.resumeTitle": "Resume recording",
     "app.recording.startDescription": "You can select the record button again later to pause the recording.",
     "app.recording.stopDescription": "Are you sure you want to pause the recording? You can resume by selecting the record button again.",
+    "app.gradingModal.title": "Grading",
+    "app.gradingModal.submit": "Submit Grades",
     "app.videoPreview.cameraLabel": "Camera",
     "app.videoPreview.profileLabel": "Quality",
     "app.videoPreview.quality.low": "Low",

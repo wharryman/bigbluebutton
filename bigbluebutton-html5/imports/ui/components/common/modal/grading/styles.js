@@ -122,6 +122,11 @@ const Title = styled.div`
   text-align: center;
 `;
 
+const GradeBox = styled.table`
+  table-layout:fixed;
+  width: 100%;
+`;
+
 const Footer = styled.div`
   display: flex;
 `;
@@ -247,4 +252,5 @@ export default {
   VideoPreviewModal,
   FetchingAnimation,
   VideoPreview,
+  GradeBox,
 };

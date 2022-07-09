@@ -21,6 +21,8 @@ import {
 } from '/imports/ui/services/virtual-background/service';
 import Settings from '/imports/ui/services/settings';
 import { isVirtualBackgroundsEnabled } from '/imports/ui/services/features';
+import Users from '/imports/api/users';
+import Auth from '/imports/ui/services/auth';
 
 const VIEW_STATES = {
   finding: 'finding',
@@ -51,6 +53,14 @@ const intlMessages = defineMessages({
   webcamSettingsTitle: {
     id: 'app.videoPreview.webcamSettingsTitle',
     description: 'Title for the video preview modal',
+  },
+  gradingModalTitle: {
+    id: 'app.gradingModal.title',
+    description: 'Title for the grading modal',
+  },
+  gradingModalSubmit: {
+    id: 'app.gradingModal.submit',
+    description: 'Text for grading submit button',
   },
   closeLabel: {
     id: 'app.videoPreview.closeLabel',
@@ -208,6 +218,19 @@ class Grading extends Component {
       viewState: VIEW_STATES.finding,
       deviceError: null,
       previewError: null,
+      students: (
+        Users.find({
+          meetingId: Auth.meetingID,
+          presenter: { $ne: true },
+          role: { $eq: 'VIEWER' },
+        }, {
+          fields: {
+            userId: 1,
+            name: 1,
+            gradevalue: 1,
+          },
+        }).fetch()
+      ),
     };
   }
 
@@ -668,51 +691,71 @@ class Grading extends Component {
 
     const { animations } = Settings.application;
 
-    switch (viewState) {
-      case VIEW_STATES.finding:
-        return (
-          <Styled.Content>
-            <Styled.VideoCol>
-              <div>
-                <span>{intl.formatMessage(intlMessages.findingWebcamsLabel)}</span>
-                <Styled.FetchingAnimation animations={animations} />
-              </div>
-            </Styled.VideoCol>
-          </Styled.Content>
-        );
-      case VIEW_STATES.error:
-        return (
-          <Styled.Content>
-            <Styled.VideoCol><div>{deviceError}</div></Styled.VideoCol>
-          </Styled.Content>
-        );
-      case VIEW_STATES.found:
-      default:
-        return (
-          <Styled.Content>
-            <Styled.VideoCol>
+      return (
+        <Styled.Content>
+          <Styled.GradeBox>
+            <colgroup>
+              <col span="3"></col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>
+                  <Styled.Label>
+                    Student Name
+                  </Styled.Label>
+                  </th>
+                <th>
+                  <Styled.Label>
+                    Academic Grade
+                  </Styled.Label>
+                  </th>
+                <th>
+                  <Styled.Label>
+                    Effort Grade
+                  </Styled.Label>
+                  </th>
+              </tr>
+            </thead>
+            <tbody>
               {
-                previewError
-                  ? (
-                    <div>{previewError}</div>
-                  )
-                  : (
-                    <Styled.VideoPreview
-                      mirroredVideo={VideoService.mirrorOwnWebcam()}
-                      id="preview"
-                      data-test={VideoService.mirrorOwnWebcam() ? 'mirroredVideoPreview' : 'videoPreview'}
-                      ref={(ref) => { this.video = ref; }}
-                      autoPlay
-                      playsInline
-                      muted
+                Object.values(this.state.students).map( (item) => (
+                <tr>
+                  <td>
+                    <Styled.Label>
+                      {item.name}
+                      {console.log(item)}
+                      {console.log(item.name)}
+                    </Styled.Label>
+                  </td>
+                  <td>
+                    <input
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      defaultValue="0"
+                      name=""
+                      id=""
                     />
-                  )
-              }
-            </Styled.VideoCol>
-            {this.renderDeviceSelectors()}
-          </Styled.Content>
-        );
-    }
+                  </td>
+                  <td>
+                    <input
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      defaultValue="0"
+                      name=""
+                      id=""
+                    />
+                  </td>
+                </tr>
+                ))
+              } 
+            </tbody>
+          </Styled.GradeBox>
+        </Styled.Content>
+      );
   }
 
   renderModalContent() {
@@ -740,48 +783,21 @@ class Grading extends Component {
 
     return (
       <>
-        {isIe ? (
-          <Styled.BrowserWarning>
-            <FormattedMessage
-              id="app.audioModal.unsupportedBrowserLabel"
-              description="Warning when someone joins with a browser that isnt supported"
-              values={{
-                0: <a href="https://www.google.com/chrome/">Chrome</a>,
-                1: <a href="https://getfirefox.com">Firefox</a>,
-              }}
-            />
-          </Styled.BrowserWarning>
-        ) : null}
         <Styled.Title>
-          {intl.formatMessage(intlMessages.webcamSettingsTitle)}
+          {intl.formatMessage(intlMessages.gradingModalTitle)}
         </Styled.Title>
 
         {this.renderContent()}
 
         <Styled.Footer>
-          {hasVideoStream && VideoService.isMultipleCamerasEnabled()
-            ? (
-              <Styled.ExtraActions>
-                <Button
-                  color="danger"
-                  label={intl.formatMessage(intlMessages.stopSharingAllLabel)}
-                  onClick={this.handleStopSharingAll}
-                  disabled={shouldDisableButtons}
-                />
-              </Styled.ExtraActions>
-            )
-            : null
-          }
           <Styled.Actions>
-            {!shared && camCapReached ? (
-              <span>{intl.formatMessage(intlMessages.camCapReached)}</span>
-            ) : (<Button
+            <Button
             data-test="startSharingWebcam"
             color={shared ? 'danger' : 'primary'}
-            label={intl.formatMessage(shared ? intlMessages.stopSharingLabel : intlMessages.startSharingLabel)}
+            label={intl.formatMessage(shared ? intlMessages.stopSharingLabel : intlMessages.gradingModalSubmit)}
             onClick={shared ? this.handleStopSharing : this.handleStartSharing}
             disabled={isStartSharingDisabled || isStartSharingDisabled === null || shouldDisableButtons}
-          />)}
+          />
           </Styled.Actions>
         </Styled.Footer>
       </>
@@ -817,16 +833,13 @@ class Grading extends Component {
       <Styled.VideoPreviewModal
         onRequestClose={this.handleProceed}
         hideBorder
-        contentLabel={intl.formatMessage(intlMessages.webcamSettingsTitle)}
+        contentLabel={intl.formatMessage(intlMessages.gradingModalTitle)}
         shouldShowCloseButton={allowCloseModal}
         shouldCloseOnOverlayClick={allowCloseModal}
         isPhone={deviceInfo.isPhone}
         data-test="webcamSettingsModal"
       >
-        {deviceInfo.hasMediaDevices
-          ? this.renderModalContent()
-          : this.supportWarning()
-        }
+        { this.renderModalContent() }
       </Styled.VideoPreviewModal>
     );
   }
