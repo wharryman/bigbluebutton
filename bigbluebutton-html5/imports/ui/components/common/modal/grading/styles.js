@@ -127,6 +127,27 @@ const GradeBox = styled.table`
   width: 100%;
 `;
 
+const NALabel = styled.span`
+  white-space: normal;
+`;
+
+const SmileyTable = styled.table`
+  table-layout:fixed;
+  width: 100%;
+`;
+
+const SmileySpace = styled.td`
+  width: 16.4%;
+`;
+
+const Smiley = styled.img`
+  width: 100%;
+`;
+
+const GradeSlider = styled.input`
+  width:96%;
+`;
+
 const Footer = styled.div`
   display: flex;
 `;
@@ -253,4 +274,9 @@ export default {
   FetchingAnimation,
   VideoPreview,
   GradeBox,
+  NALabel,
+  SmileyTable,
+  SmileySpace,
+  Smiley,
+  GradeSlider,
 };

@@ -8,19 +8,6 @@ import VideoService from '/imports/ui/components/video-provider/service';
 const GradingContainer = (props) => <Grading {...props} />;
 
 export default withModalMounter(withTracker(({ mountModal }) => ({
-  startSharing: (deviceId) => {
-    mountModal(null);
-    VideoService.joinVideo(deviceId);
-  },
-  stopSharing: (deviceId) => {
-    mountModal(null);
-    if (deviceId) {
-      const streamId = VideoService.getMyStreamId(deviceId);
-      if (streamId) VideoService.stopVideo(streamId);
-    } else {
-      VideoService.exitVideo();
-    }
-  },
   sharedDevices: VideoService.getSharedDevices(),
   isCamLocked: VideoService.isUserLocked(),
   camCapReached: VideoService.hasCapReached(),

@@ -207,6 +207,7 @@ class Grading extends Component {
     this.handleSelectWebcam = this.handleSelectWebcam.bind(this);
     this.handleSelectProfile = this.handleSelectProfile.bind(this);
     this.handleVirtualBgSelected = this.handleVirtualBgSelected.bind(this);
+    this.handleSubmitGrades = this.handleSubmitGrades.bind(this);
 
     this._isMounted = false;
 
@@ -327,6 +328,13 @@ class Grading extends Component {
     PreviewService.terminateCameraStream(this.currentVideoStream, webcamDeviceId);
     this.cleanupStreamAndVideo();
     this._isMounted = false;
+  }
+
+  handleSubmitGrades(event) {
+    const { resolve, closeModal } = this.props;
+    //submit grade event here
+    closeModal();
+    if (resolve) resolve();
   }
 
   handleSelectWebcam(event) {
@@ -690,6 +698,7 @@ class Grading extends Component {
     } = this.state;
 
     const { animations } = Settings.application;
+    const baseName = Meteor.settings.public.app.cdn + Meteor.settings.public.app.basename + Meteor.settings.public.app.instanceId;
 
       return (
         <Styled.Content>
@@ -705,15 +714,75 @@ class Grading extends Component {
                   </Styled.Label>
                   </th>
                 <th>
-                  <Styled.Label>
-                    Academic Grade
-                  </Styled.Label>
-                  </th>
+                  <Styled.SmileyTable>
+                    <tbody>
+                      <tr>
+                        <td colspan={6}>
+                          <Styled.Label>
+                            Academic Grade
+                          </Styled.Label>
+                        </td>
+                      </tr>
+                      <tr>
+                        <Styled.SmileySpace>
+                          <Styled.NALabel>
+                            N/A
+                          </Styled.NALabel>
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley1.png" alt="1" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley2.png" alt="2" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley3.png" alt="3" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley4.png" alt="4" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley5.png" alt="5" />
+                        </Styled.SmileySpace>
+                      </tr>
+                      </tbody>
+                  </Styled.SmileyTable>
+                </th>
                 <th>
-                  <Styled.Label>
-                    Effort Grade
-                  </Styled.Label>
-                  </th>
+                  <Styled.SmileyTable>
+                    <tbody>
+                      <tr>
+                        <td colspan={6}>
+                          <Styled.Label>
+                            Effort Grade
+                          </Styled.Label>
+                        </td>
+                      </tr>
+                      <tr>
+                        <Styled.SmileySpace>
+                          <Styled.NALabel>
+                            N/A
+                          </Styled.NALabel>
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley1.png" alt="1" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley2.png" alt="2" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley3.png" alt="3" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley4.png" alt="4" />
+                        </Styled.SmileySpace>
+                        <Styled.SmileySpace>
+                          <Styled.Smiley src="resources/images/smiley5.png" alt="5" />
+                        </Styled.SmileySpace>
+                      </tr>
+                    </tbody>
+                  </Styled.SmileyTable>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -728,7 +797,7 @@ class Grading extends Component {
                     </Styled.Label>
                   </td>
                   <td>
-                    <input
+                    <Styled.GradeSlider
                       type="range"
                       min="0"
                       max="5"
@@ -736,10 +805,11 @@ class Grading extends Component {
                       defaultValue="0"
                       name=""
                       id=""
-                    />
+                    >
+                    </Styled.GradeSlider>
                   </td>
                   <td>
-                    <input
+                    <Styled.GradeSlider
                       type="range"
                       min="0"
                       max="5"
@@ -747,7 +817,8 @@ class Grading extends Component {
                       defaultValue="0"
                       name=""
                       id=""
-                    />
+                    >
+                    </Styled.GradeSlider>
                   </td>
                 </tr>
                 ))
@@ -792,11 +863,10 @@ class Grading extends Component {
         <Styled.Footer>
           <Styled.Actions>
             <Button
-            data-test="startSharingWebcam"
+            data-test="submitGrades"
             color={shared ? 'danger' : 'primary'}
-            label={intl.formatMessage(shared ? intlMessages.stopSharingLabel : intlMessages.gradingModalSubmit)}
-            onClick={shared ? this.handleStopSharing : this.handleStartSharing}
-            disabled={isStartSharingDisabled || isStartSharingDisabled === null || shouldDisableButtons}
+            label={intl.formatMessage(intlMessages.gradingModalSubmit)}
+            onClick={this.handleSubmitGrades}
           />
           </Styled.Actions>
         </Styled.Footer>

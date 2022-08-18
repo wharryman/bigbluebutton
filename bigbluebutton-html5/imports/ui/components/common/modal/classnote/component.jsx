@@ -4,6 +4,8 @@ import { withModalMounter } from '/imports/ui/components/common/modal/service';
 import PropTypes from 'prop-types';
 import Styled from './styles';
 import Auth from '/imports/ui/services/auth';
+import Users from '/imports/api/users';
+import { UsersContext } from '/imports/ui/components/components-data/users-context/context';
 
 const messages = defineMessages({
   yesLabel: {
@@ -35,16 +37,42 @@ class ClassNoteModal extends Component {
 
     this.state = {
       checked: false,
+      note: "",
+      slidenum: "",
     };
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit(e) {
+  handleChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+
+  handleSubmit(e, conf) {
+    console.log(e);
+    console.log(conf);
+    console.log("Handling Submit")
     e.preventDefault()
     const data = {}
-    console.log("HERE");
-    data.currentUser = Auth.fullInfo;
-    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/classnote/', {
+    const viewerPool = Users.find({
+      meetingId: Auth.meetingID,
+      presenter: { $ne: true },
+      role: { $eq: 'VIEWER' },
+    }, {
+      fields: {
+        userId: 1,
+      },
+    }).fetch();
+    data["currentUser"] = {
+      name: Auth.fullname,
+      userId: Auth.userID,
+    };
+    data['meetingId'] = Auth.meetingID;
+    data['fullInfo'] = Auth.fullInfo;
+    data['slidenum'] = this.state.slidenum;
+    data['note'] = this.state.note;
+
+    console.log("fetching HERE");
+    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/note/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -95,20 +123,14 @@ class ClassNoteModal extends Component {
             </Styled.Title>
           </Styled.Header>
           <Styled.Description>
-            <Styled.DescriptionText>
-              {description}
-            </Styled.DescriptionText>
 	    <Styled.NoteForm>
-	    <form onSubmit="return false;">
-                    <label for="lesson">Lesson:</label>
-                    <input type="text" id="lesson" /><br/>
-                    
-	            <label for="slide">Slide #:</label>
-                    <input type="text" id="slide" /><br/>
+        <form id="classnote" onSubmit={this.handleSubmit}>
+        <label for="slide">Slide # to Start On Next Time:</label>
+        <input name="slidenum" type="text" id="slidenum" onChange={this.handleChange.bind(this)} /><br/>
 
-                    <label for="notes">Notes:</label>
-                    <textarea rows="3" cols="25" id="notes" /><br/>
-            </form>
+        <label for="notes">Notes on Today:</label>
+        <textarea name="note" rows="3" cols="25" id="note" onChange={this.handleChange.bind(this)} /><br/>
+      </form>
 	    </Styled.NoteForm>
             { hasCheckbox ? (
               <label htmlFor="confirmationCheckbox" key="confirmation-checkbox">
@@ -123,6 +145,9 @@ class ClassNoteModal extends Component {
               </label>
             ) : null }
           </Styled.Description>
+            <Styled.DescriptionText>
+              {description}
+            </Styled.DescriptionText>
 
           <Styled.Footer>
             <Styled.ConfirmationButton
@@ -130,15 +155,17 @@ class ClassNoteModal extends Component {
               label={intl.formatMessage(messages.yesLabel)}
               disabled={disableConfirmButton}
               data-test={confirmButtonDataTest}
-              onClick={() => {
-		this.handleSubmit.bind(this);
-                onConfirm(confirmParam, checked);
-                mountModal(null);
+              onClick={ () => {
+                console.log("Possibly handling submit")
+                this.handleSubmit(event, 
+                  onConfirm(confirmParam, checked));
               }}
             />
             <Styled.ConfirmationButton
               label={intl.formatMessage(messages.noLabel)}
-              onClick={() => mountModal(null)}
+              onClick={() => {
+                mountModal(null);
+              }}
             />
           </Styled.Footer>
         </Styled.Container>

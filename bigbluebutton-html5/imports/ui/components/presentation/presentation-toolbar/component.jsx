@@ -140,6 +140,7 @@ class PresentationToolbar extends PureComponent {
     console.log("nextSlideHandler");
     nextSlide(currentSlideNum, numberOfSlides, podId);
     mountGrading();
+    console.log("nextSlide Complete");
   }
 
   previousSlideHandler(event) {
