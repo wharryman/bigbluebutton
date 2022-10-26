@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
-import ConfirmationModal from '/imports/ui/components/common/modal/confirmation/component';
+import ClassNoteModal from '/imports/ui/components/common/modal/classnote/component';
 
 const intlMessages = defineMessages({
   endMeetingTitle: {
@@ -51,7 +51,7 @@ class EndMeetingComponent extends PureComponent {
     }
 
     return (
-      <ConfirmationModal
+      <ClassNoteModal
         intl={intl}
         onConfirm={endMeeting}
         title={title}

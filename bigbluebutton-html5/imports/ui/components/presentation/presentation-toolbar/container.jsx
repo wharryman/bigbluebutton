@@ -11,6 +11,9 @@ import { UsersContext } from '/imports/ui/components/components-data/users-conte
 import Auth from '/imports/ui/services/auth';
 import FullscreenService from '/imports/ui/components/common/fullscreen-button/service';
 import { isPollingEnabled } from '/imports/ui/services/features';
+import GradingContainer from '/imports/ui/components/common/modal/grading/container';
+import { withModalMounter } from '/imports/ui/components/common/modal/service';
+import { injectIntl } from 'react-intl';
 
 const PresentationToolbarContainer = (props) => {
   const usingUsersContext = useContext(UsersContext);
@@ -18,27 +21,25 @@ const PresentationToolbarContainer = (props) => {
   const currentUser = users[Auth.meetingID][Auth.userID];
   const userIsPresenter = currentUser.presenter;
 
-  const { layoutSwapped } = props;
+  const { 
+    layoutSwapped,
+    intl,
+    mountModal,
+    ...restProps
+  } = props;
 
   const handleToggleFullScreen = (ref) => FullscreenService.toggleFullScreen(ref);
+  const mountGrading = () => { mountModal(<GradingContainer />); };
 
-  if (userIsPresenter && !layoutSwapped) {
-    // Only show controls if user is presenter and layout isn't swapped
-
-    return (
-      <PresentationToolbar
-        {...props}
-        amIPresenter={userIsPresenter}
-        {...{
-          handleToggleFullScreen,
-        }}
-      />
-    );
-  }
-  return null;
+  return (
+    <PresentationToolbar{...{
+      mountGrading, ...restProps,
+    }}
+    />
+  );
 };
 
-export default withTracker((params) => {
+export default withModalMounter(withTracker((params) => {
   const {
     podId,
     presentationId,
@@ -64,7 +65,8 @@ export default withTracker((params) => {
     parseCurrentSlideContent: PresentationService.parseCurrentSlideContent,
     startPoll,
   };
-})(PresentationToolbarContainer);
+})(PresentationToolbarContainer));
+
 
 PresentationToolbarContainer.propTypes = {
   // Number of current slide being displayed
