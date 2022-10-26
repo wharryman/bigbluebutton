@@ -72,7 +72,7 @@ class ClassNoteModal extends Component {
     data['note'] = this.state.note;
 
     console.log("fetching HERE");
-    fetch('https://tutorcalculator.mindriselearningonline.com/webhook/note/', {
+    fetch('https://reports.mindriselearningonline.com/webhook/note/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

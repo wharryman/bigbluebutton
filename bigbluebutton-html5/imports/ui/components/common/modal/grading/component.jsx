@@ -229,6 +229,8 @@ class Grading extends Component {
             userId: 1,
             name: 1,
             gradevalue: 1,
+	    academic: 1,
+	    effort: 1,
           },
         }).fetch()
       ),
@@ -331,8 +333,40 @@ class Grading extends Component {
   }
 
   handleSubmitGrades(event) {
+    event.preventDefault();
     const { resolve, closeModal } = this.props;
-    //submit grade event here
+    const data = {}
+    console.log('start grading here');
+    data.students = this.state.students;
+    console.log('this.state.students');
+    console.log(this.state.students);
+    data.meetingId = Auth.meetingID;
+    data.fullInfo = Auth.fullInfo
+    data.currentUser = {
+           name: Auth.fullname,
+           userId: Auth.userID,
+    };
+
+    data.students.map((i) => {
+      console.log('finding ' + i.name);
+      i.academic = document.getElementById(i.userId + '-academic').value
+      i.effort= document.getElementById(i.userId + '-effort').value
+    });
+    fetch('https://reports.mindriselearningonline.com/webhook/fullgrade/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      console.log('Success:', data);
+    //TODO: add robust success/error code
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+
     closeModal();
     if (resolve) resolve();
   }
@@ -804,7 +838,7 @@ class Grading extends Component {
                       step="1"
                       defaultValue="0"
                       name=""
-                      id=""
+                      id={item.userId + "-academic"}
                     >
                     </Styled.GradeSlider>
                   </td>
@@ -816,7 +850,7 @@ class Grading extends Component {
                       step="1"
                       defaultValue="0"
                       name=""
-                      id=""
+                      id={item.userId+"-effort"}
                     >
                     </Styled.GradeSlider>
                   </td>
