@@ -48,6 +48,25 @@ const Title = styled.div`
   font-size: ${jumboPaddingY};
 `;
 
+const SurveyHead = styled.div`
+  margin: 0;
+  padding: 0;
+  border: none;
+  line-height: ${titlePositionLeft};
+  margin-bottom: ${lgPaddingY};
+`;
+const SurveyTitle = styled.div`
+  color: ${colorGrayDark};
+  font-weight: ${headingsFontWeight};
+  font-size: ${jumboPaddingY};
+`;
+const SurveySubTitle = styled.div`
+  text-align: center;
+  line-height: ${lineHeightBase};
+  color: ${colorGray};
+`;
+
+
 const Description = styled.div`
   text-align: center;
   line-height: ${lineHeightBase};
@@ -74,6 +93,10 @@ const Checkbox = styled.input`
       margin-left: 0.5rem;
   }
 `;
+const Radio = styled.input`
+  margin-left: 0.5rem;
+  margin-right: 0.2rem;
+  `;
 
 const Footer = styled.div`
   display:flex;
@@ -100,4 +123,8 @@ export default {
   Checkbox,
   Footer,
   ConfirmationButton,
+  Radio,
+  SurveyHead,
+  SurveyTitle,
+  SurveySubTitle,
 };
