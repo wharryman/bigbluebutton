@@ -12,6 +12,9 @@ import FullscreenService from '/imports/ui/components/common/fullscreen-button/s
 import { isPollingEnabled } from '/imports/ui/services/features';
 import { CurrentPoll } from '/imports/api/polls';
 import { PluginsContext } from '/imports/ui/components/components-data/plugin-context/context';
+import GradingContainer from '/imports/ui/components/common/modal/grading/container';
+import { withModalMounter } from '/imports/ui/components/common/modal/service';
+import { injectIntl } from 'react-intl';
 
 const PresentationToolbarContainer = (props) => {
   const usingUsersContext = useContext(UsersContext);
@@ -21,9 +24,15 @@ const PresentationToolbarContainer = (props) => {
   const currentUser = users[Auth.meetingID][Auth.userID];
   const userIsPresenter = currentUser.presenter;
 
-  const { layoutSwapped } = props;
+  const {
+    layoutSwapped,
+    intl,
+    mountModal,
+    ...restProps
+  } = props;
 
   const handleToggleFullScreen = (ref) => FullscreenService.toggleFullScreen(ref);
+  const mountGrading = () => { mountModal(<GradingContainer />); };
 
   const endCurrentPoll = () => {
     if (CurrentPoll.findOne({ meetingId: Auth.meetingID })) makeCall('stopPoll');
@@ -50,7 +59,7 @@ const PresentationToolbarContainer = (props) => {
   return null;
 };
 
-export default withTracker((params) => {
+export default withModalMounter(withTracker((params) => {
   const {
     podId,
     presentationId,
@@ -75,7 +84,7 @@ export default withTracker((params) => {
     parseCurrentSlideContent: PresentationService.parseCurrentSlideContent,
     startPoll,
   };
-})(PresentationToolbarContainer);
+})(PresentationToolbarContainer));
 
 PresentationToolbarContainer.propTypes = {
   // Number of current slide being displayed

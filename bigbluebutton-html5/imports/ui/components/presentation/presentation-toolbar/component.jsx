@@ -111,6 +111,7 @@ class PresentationToolbar extends PureComponent {
     this.fullscreenToggleHandler = this.fullscreenToggleHandler.bind(this);
     this.switchSlide = this.switchSlide.bind(this);
     this.handleSwitchWhiteboardMode = this.handleSwitchWhiteboardMode.bind(this);
+    this.renderGradingModal = this.renderGradingModal.bind(this);
   }
 
   componentDidMount() {
@@ -193,11 +194,12 @@ class PresentationToolbar extends PureComponent {
 
   nextSlideHandler(event) {
     const {
-      nextSlide, currentSlideNum, numberOfSlides, podId, endCurrentPoll
+      nextSlide, currentSlideNum, numberOfSlides, podId, endCurrentPoll, mountGrading,
     } = this.props;
 
     this.handleFTWSlideChange();
     if (event) event.currentTarget.blur();
+    mountGrading();
     endCurrentPoll();
     nextSlide(currentSlideNum, numberOfSlides, podId);
   }
@@ -311,6 +313,13 @@ class PresentationToolbar extends PureComponent {
           {intl.formatMessage(intlMessages.fitToPageDesc)}
         </div>
       </div>
+    );
+  }
+  renderGradingModal() {
+    const { intl } = this.props;
+    return (
+      <GradingContainer
+      />
     );
   }
 
@@ -548,6 +557,7 @@ PresentationToolbar.propTypes = {
   currentSlide: PropTypes.shape().isRequired,
   slidePosition: PropTypes.shape().isRequired,
   multiUserSize: PropTypes.number.isRequired,
+  mountGrading: PropTypes.func.isRequired,
 };
 
 PresentationToolbar.defaultProps = {

@@ -1371,6 +1371,8 @@
     "app.learningDashboard.statusTimelineTable.setAt": "Set at",
     "app.learningDashboard.errors.invalidToken": "Invalid session token",
     "app.learningDashboard.errors.dataUnavailable": "Data is no longer available",
+    "app.gradingModal.title": "Grading",
+    "app.gradingModal.submit": "Submit Grades",
     "mobileApp.portals.list.empty.addFirstPortal.label": "Add your first portal using the button above,",
     "mobileApp.portals.list.empty.orUseOurDemoServer.label": "or use our demo server.",
     "mobileApp.portals.list.add.button.label": "Add portal",
