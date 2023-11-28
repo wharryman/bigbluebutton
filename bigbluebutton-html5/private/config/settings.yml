@@ -69,7 +69,7 @@ public:
     alwaysShowWaitingRoomUI: true
     enableLimitOfViewersInWebcam: false
     enableMultipleCameras: true
-    enableCameraAsContent: true
+    enableCameraAsContent: false
     # Allow users to open webcam video modal/preview when video is already
     # active. This also allows to change virtual backgrounds without
     # restarting webcam.
@@ -286,9 +286,9 @@ public:
     fallbackOnEmptyLocaleString: true
     disableWebsocketFallback: true
   externalVideoPlayer:
-    enabled: true
+    enabled: false
   kurento:
-    wsUrl: HOST
+    wsUrl: wss://bbb27dev.mindriselearningonline.com/bbb-webrtc-sfu
     cameraWsOptions:
       # Valid for video-provider. Time (ms) before its WS connection times out
       # and tries to reconnect.
@@ -780,9 +780,9 @@ public:
       - critical
     help: STATS_HELP_URL
   presentation:
-    allowDownloadOriginal: true
-    allowDownloadWithAnnotations: true
-    allowSnapshotOfCurrentSlide: true
+    allowDownloadOriginal: false
+    allowDownloadWithAnnotations: false
+    allowSnapshotOfCurrentSlide: false
     panZoomThrottle: 32
     restoreOnUpdate: true
     uploadEndpoint: '/bigbluebutton/presentation/upload'
