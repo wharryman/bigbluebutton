@@ -13,6 +13,7 @@ import ZoomTool from './zoom-tool/component';
 import SmartMediaShareContainer from './smart-video-share/container';
 import TooltipContainer from '/imports/ui/components/common/tooltip/container';
 import KEY_CODES from '/imports/utils/keyCodes';
+import GradingModalContainer from '/imports/ui/components/common/modal/grading/container';
 
 const intlMessages = defineMessages({
   previousSlideLabel: {
@@ -95,6 +96,7 @@ class PresentationToolbar extends PureComponent {
 
     this.state = {
       wasFTWActive: false,
+      isGradingModalOpen: false,
     };
 
     this.setWasActive = this.setWasActive.bind(this);
@@ -107,6 +109,7 @@ class PresentationToolbar extends PureComponent {
     this.fullscreenToggleHandler = this.fullscreenToggleHandler.bind(this);
     this.switchSlide = this.switchSlide.bind(this);
     this.handleSwitchWhiteboardMode = this.handleSwitchWhiteboardMode.bind(this);
+    this.setGradingModalIsOpen = this.setGradingModalIsOpen.bind(this);
   }
 
   componentDidMount() {
@@ -131,9 +134,6 @@ class PresentationToolbar extends PureComponent {
     document.removeEventListener('keydown', this.switchSlide);
   }
 
-  setWasActive(wasFTWActive) {
-    this.setState({ wasFTWActive });
-  }
 
   handleFTWSlideChange() {
     const { fitToWidth, fitToWidthHandler } = this.props;
@@ -164,6 +164,12 @@ class PresentationToolbar extends PureComponent {
     }
     return addWhiteboardGlobalAccess(whiteboardId);
   }
+  setWasActive(wasFTWActive) {
+    this.setState({ wasFTWActive });
+  }
+  setGradingModalIsOpen(value) {
+    this.setState({ isGradingModalOpen: value });
+  }
 
   fullscreenToggleHandler() {
     const {
@@ -193,6 +199,7 @@ class PresentationToolbar extends PureComponent {
     } = this.props;
 
     this.handleFTWSlideChange();
+    this.setState({isGradingModalOpen: true});
     if (event) event.currentTarget.blur();
     endCurrentPoll();
     nextSlide(currentSlideNum, numberOfSlides, podId);
@@ -281,6 +288,20 @@ class PresentationToolbar extends PureComponent {
     return optionList;
   }
 
+  renderModal(isOpen, setIsOpen, priority, Component) {
+    return isOpen ? (
+      <Component
+        {...{
+          onRequestClose: () => setIsOpen(false),
+          priority,
+          setIsOpen,
+          isOpen,
+        }}
+      />
+    ) : null;
+  }
+
+
   render() {
     const {
       currentSlideNum,
@@ -300,6 +321,10 @@ class PresentationToolbar extends PureComponent {
       multiUserSize,
       multiUser,
     } = this.props;
+
+    const {
+      isGradingModalOpen
+      } = this.state;
 
     const { isMobile } = deviceInfo;
 
@@ -456,6 +481,12 @@ class PresentationToolbar extends PureComponent {
             $fitToWidth={fitToWidth}
           />
         </Styled.PresentationZoomControls>
+        {this.renderModal(
+          isGradingModalOpen,
+          this.setGradingModalIsOpen,
+          'low',
+          GradingModalContainer,
+        )}
       </Styled.PresentationToolbarWrapper>
     );
   }

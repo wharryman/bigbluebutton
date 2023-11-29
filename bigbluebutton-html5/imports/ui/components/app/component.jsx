@@ -24,6 +24,7 @@ import AudioCaptionsSpeechContainer from '/imports/ui/components/audio/captions/
 import UploaderContainer from '/imports/ui/components/presentation/presentation-uploader/container';
 import CaptionsSpeechContainer from '/imports/ui/components/captions/speech/container';
 import RandomUserSelectContainer from '/imports/ui/components/common/modal/random-user/container';
+import GradingModalContainer from '/imports/ui/components/common/modal/grading/container';
 import ScreenReaderAlertContainer from '../screenreader-alert/container';
 import WebcamContainer from '../webcam/container';
 import PresentationAreaContainer from '../presentation/presentation-area/container';
@@ -149,6 +150,7 @@ class App extends Component {
       isRandomUserSelectModalOpen: false,
       isVideoPreviewModalOpen: false,
       presentationFitToWidth: false,
+      isGradingModalOpen: false,
     };
 
     this.isTimerEnabled = TimerService.isEnabled();
@@ -158,8 +160,9 @@ class App extends Component {
     this.handleWindowResize = throttle(this.handleWindowResize).bind(this);
     this.shouldAriaHide = this.shouldAriaHide.bind(this);
     this.setAudioModalIsOpen = this.setAudioModalIsOpen.bind(this);
-    this.setRandomUserSelectModalIsOpen = this.setRandomUserSelectModalIsOpen.bind(this);
     this.setVideoPreviewModalIsOpen = this.setVideoPreviewModalIsOpen.bind(this);
+    this.setRandomUserSelectModalIsOpen = this.setRandomUserSelectModalIsOpen.bind(this);
+    this.setGradingModalIsOpen = this.setGradingModalIsOpen.bind(this);
 
     this.throttledDeviceType = throttle(() => this.setDeviceType(),
       50, { trailing: true, leading: true }).bind(this);
@@ -244,6 +247,7 @@ class App extends Component {
       intl,
       deviceType,
       mountRandomUserModal,
+      mountGradingModal,
       selectedLayout,
       sidebarContentIsOpen,
       layoutContextDispatch,
@@ -254,6 +258,7 @@ class App extends Component {
     this.renderDarkMode();
 
     if (mountRandomUserModal) this.setRandomUserSelectModalIsOpen(true);
+    if (mountGradingModal) this.setGradingModalIsOpen(true);
 
     if (prevProps.currentUserEmoji.status !== currentUserEmoji.status
         && currentUserEmoji.status !== 'raiseHand'
@@ -566,6 +571,11 @@ class App extends Component {
     this.setState({isRandomUserSelectModalOpen: value});
     setMountRandomUserModal(false);
   }
+  setGradingModalIsOpen(value) {
+    const {setMountGradingModal} = this.props;
+    this.setState({isGradingModalOpen: value});
+    setMountGradingModal(false);
+  }
 
   render() {
     const {
@@ -583,7 +593,7 @@ class App extends Component {
       darkTheme,
     } = this.props;
 
-    const { isAudioModalOpen, isRandomUserSelectModalOpen, isVideoPreviewModalOpen, presentationFitToWidth } = this.state;
+    const { isAudioModalOpen, isRandomUserSelectModalOpen, isGradingModalOpen, isVideoPreviewModalOpen, presentationFitToWidth } = this.state;
 
     return (
       <>
@@ -657,6 +667,14 @@ class App extends Component {
               priority: "low",
               setIsOpen: this.setRandomUserSelectModalIsOpen,
               isOpen: isRandomUserSelectModalOpen,
+            }}
+          /> : null}
+          {isGradingModalOpen ? <GradingModalContainer
+            {...{
+              onRequestClose: () => this.setGradingModalIsOpen(false),
+              priority: "low",
+              setIsOpen: this.setGradingModalIsOpen,
+              isOpen: isGradingModalOpen,
             }}
           /> : null}
         </Styled.Layout>

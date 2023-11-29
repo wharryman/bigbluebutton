@@ -118,6 +118,7 @@ const AppContainer = (props) => {
   const prevRandomUser = usePrevious(randomlySelectedUser);
 
   const [mountRandomUserModal, setMountRandomUserModal] = useState(false);
+  const [mountGradingModal, setMountGradingModal] = useState(false);
 
   useEffect(() => {
     setMountRandomUserModal(!isPresenter
@@ -125,6 +126,11 @@ const AppContainer = (props) => {
       && randomlySelectedUser.length > 0
       && !isModalOpen);
   }, [isPresenter, prevRandomUser, randomlySelectedUser, isModalOpen]);
+  
+  useEffect(() => {
+    setMountGradingModal(!isPresenter
+      && !isModalOpen);
+  }, [isPresenter, isModalOpen]);
 
   const setPushLayout = () => {
     LayoutService.setPushLayout(pushLayout);
@@ -183,6 +189,8 @@ const AppContainer = (props) => {
           shouldShowPresentation,
           mountRandomUserModal,
           setMountRandomUserModal,
+          mountGradingModal,
+          setMountGradingModal,
           isPresenter,
           numCameras: cameraDockInput.numCameras,
         }}
