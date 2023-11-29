@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import ModalSimple from '/imports/ui/components/common/modal/simple/component';
 import AudioService from '/imports/ui/components/audio/service';
 import Styled from './styles';
-
-const SELECT_RANDOM_USER_COUNTDOWN = Meteor.settings.public.selectRandomUser.countdown;
+import Users from '/imports/api/users';
+import Auth from '/imports/ui/services/auth';
 
 const messages = defineMessages({
   noViewers: {
@@ -42,51 +42,68 @@ const propTypes = {
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
   }).isRequired,
-  numAvailableViewers: PropTypes.number.isRequired,
-  randomUserReq: PropTypes.func.isRequired,
 };
 
 class GradingModal extends Component {
   constructor(props) {
     super(props);
-
-    if (props.currentUser.presenter) {
-      props.randomUserReq();
+    this.state = {
+      students: (
+        Users.find({
+          meetingId: Auth.meetingID,
+          presenter: { $ne: true },
+          role: { $eq: 'VIEWER' },
+        }, {
+          fields: {
+            userId: 1,
+            name: 1,
+            gradevalue: 1,
+      academic: 1,
+      effort: 1,
+          },
+        }).fetch()
+      ),
+      currentUser: {
+         name: Auth.fullname,
+         userId: Auth.userID,
+       } 
     }
+    this.handleSubmitGrades = this.handleSubmitGrades.bind(this);
 
-    if (SELECT_RANDOM_USER_COUNTDOWN) {
-      this.state = {
-        count: 0,
-      };
-      this.play = this.play.bind(this);
-    }
   }
   
-  componentDidUpdate(prevProps, prevState) {
-    if (SELECT_RANDOM_USER_COUNTDOWN) {
-      if (this.props.currentUser.presenter && this.state.count === 0) {
-        this.iterateSelection();
-      }
+  handleSubmitGrades(event) {
+    event.preventDefault();
+    const { resolve, closeModal } = this.props;
+    const data = {}
+    data.students = this.state.students;
+    console.log("students");
+    console.log(data.students);
+    data.meetingId = Auth.meetingID;
+    data.fullInfo = Auth.fullInfo
+    data.currentUser = this.state.currentUser;
 
-      if ((prevState.count !== this.state.count) && this.props.keepModalOpen) {
-        this.play();
-      }
-    }
-  }
+    data.students.map((i) => {
+      i.academic = document.getElementById(i.userId + "-academic").value
+      i.effort = document.getElementById(i.userId + "-effort").value
+    });
+    fetch("https://reports.mindriselearningonline.com/webhook/fullgrade/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      console.log("Success:", data);
+    //TODO: add robust success/error code
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
 
-  iterateSelection() {
-    if (this.props.mappedRandomlySelectedUsers.length > 1) {
-      const that = this;
-      setTimeout(delay(that.props.mappedRandomlySelectedUsers, 1), that.props.mappedRandomlySelectedUsers[1][1]);
-      function delay(arr, num) {
-        that.setState({
-          count: num,
-        });
-        if (num < that.props.mappedRandomlySelectedUsers.length - 1) {
-          setTimeout(() => { delay(arr, num + 1); }, arr[num + 1][1]);
-        }
-      }
-    }
+    closeModal();
+    if (resolve) resolve();
   }
 
   componentDidMount() {
@@ -95,27 +112,6 @@ class GradingModal extends Component {
     if (currentUser.presenter && !keepModalOpen) {
       toggleKeepModalOpen();
     }
-
-    if (SELECT_RANDOM_USER_COUNTDOWN && !currentUser.presenter) {
-      this.iterateSelection();
-    }
-  }
-
-
-  play() {
-    AudioService.playAlertSound(`${Meteor.settings.public.app.cdn
-      + Meteor.settings.public.app.basename
-      + Meteor.settings.public.app.instanceId}`
-      + '/resources/sounds/Poll.mp3');
-  }
-
-  reselect() {
-    if (SELECT_RANDOM_USER_COUNTDOWN) {
-      this.setState({
-        count: 0,
-      });
-    }
-    this.props.randomUserReq();
   }
 
   render() {
@@ -124,76 +120,23 @@ class GradingModal extends Component {
       toggleKeepModalOpen,
       intl,
       setIsOpen,
-      numAvailableViewers,
-      currentUser,
-      clearRandomlySelectedUser,
-      mappedRandomlySelectedUsers,
       isOpen,
       priority,
     } = this.props;
 
-    const counter = SELECT_RANDOM_USER_COUNTDOWN ? this.state.count : 0;
-    if (mappedRandomlySelectedUsers.length < counter + 1) return null;
-
-    const selectedUser = SELECT_RANDOM_USER_COUNTDOWN ? mappedRandomlySelectedUsers[counter][0] :
-      mappedRandomlySelectedUsers[mappedRandomlySelectedUsers.length - 1][0];
-    const countDown = SELECT_RANDOM_USER_COUNTDOWN ?
-      mappedRandomlySelectedUsers.length - this.state.count - 1 : 0;
-
     let viewElement;
     let title;
 
-    const amISelectedUser = currentUser.userId === selectedUser.userId;
-    if (numAvailableViewers < 1 || (currentUser.presenter && amISelectedUser)) { // there's no viewers to select from,
-      // or when you are the presenter but selected, which happens when the presenter ability is passed to somebody
-      // and people are entering and leaving the meeting
-      // display modal informing presenter that there's no viewers to select from
       viewElement = (
         <Styled.ModalViewContainer>
-          <div data-test="noViewersSelectedMessage">
-            {intl.formatMessage(messages.noViewers)}
-          </div>
+        test test test
         </Styled.ModalViewContainer>
       );
-      title = intl.formatMessage(messages.randUserTitle);
-    } else { // viewers are available
-      if (!selectedUser) return null; // rendering triggered before selectedUser is available
-
-      // display modal with random user selection
-      viewElement = (
-        <Styled.ModalViewContainer>
-          <Styled.ModalAvatar aria-hidden style={{ backgroundColor: `${selectedUser.color}` }}>
-            {selectedUser.name.slice(0, 2)}
-          </Styled.ModalAvatar>
-          <Styled.SelectedUserName data-test="selectedUserName">
-            {selectedUser.name}
-          </Styled.SelectedUserName>
-          {currentUser.presenter
-            && countDown === 0
-            && (
-            <Styled.SelectButton
-              label={intl.formatMessage(messages.reselect)}
-              color="primary"
-              size="md"
-              onClick={() => this.reselect()}
-              data-test="selectAgainRadomUser"
-            />
-            )}
-        </Styled.ModalViewContainer>
-      );
-      title = countDown == 0
-        ? amISelectedUser
-          ? `${intl.formatMessage(messages.selected)}`
-          : numAvailableViewers == 1 && currentUser.presenter
-            ? `${intl.formatMessage(messages.onlyOneViewerTobeSelected)}`
-            : `${intl.formatMessage(messages.randUserTitle)}`
-        : `${intl.formatMessage(messages.whollbeSelected)} ${countDown}`;
-    }
     if (keepModalOpen) {
       return (
         <ModalSimple
           onRequestClose={() => {
-            if (currentUser.presenter) clearRandomlySelectedUser();
+            if (this.state.currentUser.presenter) clearRandomlySelectedUser();
             toggleKeepModalOpen();
             setIsOpen(false);
           }}
