@@ -1,26 +1,21 @@
 import styled from 'styled-components';
 import Button from '/imports/ui/components/common/button/component';
-import Modal from '/imports/ui/components/common/modal/simple/component';
+import ModalSimple from '/imports/ui/components/common/modal/simple/component';
 import {
   smPaddingX,
   smPaddingY,
   lgPaddingX,
   lgPaddingY,
+  mdPaddingX,
   descriptionMargin,
   titlePositionLeft,
   jumboPaddingY,
 } from '/imports/ui/stylesheets/styled-components/general';
-import {
-  colorGrayDark,
-  colorGray,
-} from '/imports/ui/stylesheets/styled-components/palette';
-import {
-  headingsFontWeight,
-  lineHeightBase,
-} from '/imports/ui/stylesheets/styled-components/typography';
+import { colorGray, colorGrayDark, } from '/imports/ui/stylesheets/styled-components/palette';
+import { headingsFontWeight, lineHeightBase } from '/imports/ui/stylesheets/styled-components/typography';
 
-const ClassNoteModal = styled(Modal)`
-  padding: ${smPaddingY};
+const ClassNoteModal = styled(ModalSimple)`
+  padding: ${mdPaddingX};
 `;
 
 const Container = styled.div`
@@ -29,9 +24,14 @@ const Container = styled.div`
   flex-direction: column;
   padding: 0;
   margin-top: 0;
-  margin-right: ${descriptionMargin};
-  margin-left: ${descriptionMargin};
-  margin-bottom: ${lgPaddingX};
+  margin: auto;
+`;
+
+const Description = styled.div`
+  text-align: center;
+  line-height: ${lineHeightBase};
+  color: ${colorGray};
+  margin-bottom: ${jumboPaddingY};
 `;
 
 const Header = styled.div`
@@ -42,6 +42,9 @@ const Header = styled.div`
   margin-bottom: ${lgPaddingY};
 `;
 
+const DescriptionText = styled.span`
+  white-space: pre-line;
+`;
 const Title = styled.div`
   color: ${colorGrayDark};
   font-weight: ${headingsFontWeight};
@@ -67,18 +70,18 @@ const SurveySubTitle = styled.div`
 const Radio = styled.input`
   margin-left: 0.5rem;
   margin-right: 0.2rem;
-  `;
+  `
 
-const Description = styled.div`
-  text-align: center;
-  line-height: ${lineHeightBase};
-  color: ${colorGray};
+const Checkbox = styled.input`
+  position: relative;
+  top: 0.134rem;
+  margin-right: 0.5rem;
+
+  [dir="rtl"] & {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
 `;
-
-const DescriptionText = styled.span`
-  white-space: pre-line;
-`;
-
 const NoteForm = styled.div`
   text-align: center;
   line-height: ${lineHeightBase};
@@ -86,18 +89,9 @@ const NoteForm = styled.div`
   margin-bottom: ${jumboPaddingY};
 `;
 
-const Checkbox = styled.input`
-  position: relative;
-  top: 0.134rem;
-  margin-right: 0.5rem;
-  [dir="rtl"] & {
-      margin-right: 0;
-      margin-left: 0.5rem;
-  }
-`;
-
 const Footer = styled.div`
   display:flex;
+  margin-bottom: ${lgPaddingY};
 `;
 
 const ConfirmationButton = styled(Button)`
@@ -110,17 +104,27 @@ const ConfirmationButton = styled(Button)`
   }
 `;
 
+const CancelButton = styled(ConfirmationButton)`
+  margin: 0;
+`;
+
+const Label = styled.label`
+  display: block;
+`;
+
 export default {
   ClassNoteModal,
   Container,
-  Header,
-  Title,
   Description,
   DescriptionText,
-  NoteForm,
   Checkbox,
   Footer,
   ConfirmationButton,
+  CancelButton,
+  Label,
+  Header,
+  Title,
+  NoteForm,
   Radio,
   SurveyHead,
   SurveyTitle,
