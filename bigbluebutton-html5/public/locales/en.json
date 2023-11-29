@@ -1398,7 +1398,5 @@
     "mobileApp.portals.drawerNavigation.button.label": "Portals",
     "mobileApp.portals.addPortalPopup.validation.emptyFields": "Required Fields",
     "mobileApp.portals.addPortalPopup.validation.portalNameAlreadyExists": "Name already in use",
-    "mobileApp.portals.addPortalPopup.validation.urlInvalid": "Error trying to load the page - check URL and network connection",
-    "app.gradingModal.title": "Grading",
-    "app.gradingModal.submit": "Submit Grades",
+    "mobileApp.portals.addPortalPopup.validation.urlInvalid": "Error trying to load the page - check URL and network connection"
 }
