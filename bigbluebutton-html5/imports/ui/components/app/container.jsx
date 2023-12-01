@@ -127,10 +127,12 @@ const AppContainer = (props) => {
       && !isModalOpen);
   }, [isPresenter, prevRandomUser, randomlySelectedUser, isModalOpen]);
   
+  /* causes modal to appear upon site load
   useEffect(() => {
-    setMountGradingModal(!isPresenter
+    setMountGradingModal(isPresenter
       && !isModalOpen);
   }, [isPresenter, isModalOpen]);
+  */
 
   const setPushLayout = () => {
     LayoutService.setPushLayout(pushLayout);
