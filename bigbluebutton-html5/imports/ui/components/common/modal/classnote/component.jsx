@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { defineMessages } from 'react-intl';
 import PropTypes from 'prop-types';
 import Styled from './styles';
+import Auth from '/imports/ui/services/auth';
+import Users from '/imports/api/users';
 
 const messages = defineMessages({
   yesLabel: {
@@ -127,6 +129,8 @@ class ClassNoteModal extends Component {
     data['camon'] = this.state.camon;
 
     console.log("fetching HERE");
+    console.log("data fetched:");
+    console.log(data);
     fetch('https://reports.mindriselearningonline.com/webhook/note/', {
       method: 'POST',
       headers: {
@@ -257,6 +261,7 @@ class ClassNoteModal extends Component {
               data-test={confirmButtonDataTest}
               onClick={() => {
                 onConfirm(confirmParam, checked);
+                this.handleSubmit(event);
                 setIsOpen(false);
               }}
             />

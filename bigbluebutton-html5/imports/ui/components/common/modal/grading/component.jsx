@@ -267,16 +267,16 @@ class GradingModal extends Component {
                 </Styled.GradeSlider>
               </td>
               <td>
-                <Styled.Radio
-                  type="radio"
+                <Styled.Checkbox
+                  type="checkbox"
                   id={item.userId+"-nocam"}
                   value=""
                   name="nocam"
                   onChange={this.handleChange.bind(this)}
                 />
                 <label for={item.userId+"-nocam"}>No Cam</label>
-                <Styled.Radio
-                  type="radio"
+                <Styled.Checkbox
+                  type="checkbox"
                   id={item.userId+"-nomic"}
                   value=""
                   name="nomic"

@@ -216,7 +216,7 @@ const CancelButton = styled(ConfirmationButton)`
 const Footer = styled.div`
   display:flex;
 `;
-const Radio = styled.input`
+const Checkbox = styled.input`
   margin-left: 0.5rem;
   margin-right: 0.2rem;
   `
@@ -243,5 +243,5 @@ export default {
   GradeSlider,
   ConfirmationButton,
   CancelButton,
-  Radio,
+  Checkbox,
 };
